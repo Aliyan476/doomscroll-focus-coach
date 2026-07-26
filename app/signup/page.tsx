@@ -18,7 +18,6 @@ export default function SignupPage() {
     setMessage("");
 
     try {
-      // Create account
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -35,23 +34,11 @@ export default function SignupPage() {
         return;
       }
 
-      // Sign in immediately
-      const { error: loginError } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-      if (loginError) {
-        setMessage(loginError.message);
-        setLoading(false);
-        return;
-      }
-
-      // Redirect
+      // Redirect after successful signup
       router.push("/dashboard");
+
     } catch (err) {
-      console.error(err);
+      console.error("Signup error:", err);
       setMessage("Something went wrong.");
     }
 
@@ -97,11 +84,24 @@ export default function SignupPage() {
           {loading ? "Creating Account..." : "Create Account"}
         </button>
 
+
+        <p className="mt-6 text-center text-slate-400">
+          Already have an account?{" "}
+          <button
+            onClick={() => router.push("/login")}
+            className="text-cyan-400 hover:underline"
+          >
+            Login
+          </button>
+        </p>
+
+
         {message && (
           <p className="mt-4 text-center text-red-400">
             {message}
           </p>
         )}
+
       </div>
     </main>
   );

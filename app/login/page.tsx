@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "../../lib/supabase";
 import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,8 +10,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleLogin() {
+    setLoading(true);
+    setMessage("");
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -19,9 +23,11 @@ export default function LoginPage() {
 
     if (error) {
       setMessage(error.message);
-    } else {
-      router.push("/dashboard");
+      setLoading(false);
+      return;
     }
+
+    router.push("/dashboard");
   }
 
   return (
@@ -35,28 +41,33 @@ export default function LoginPage() {
         <input
           className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 mb-4"
           placeholder="Email"
+          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
           className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 mb-6"
-          type="password"
           placeholder="Password"
+          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
           onClick={handleLogin}
-          className="w-full rounded-lg bg-cyan-500 py-3 font-semibold hover:bg-cyan-400"
+          disabled={loading}
+          className="w-full rounded-lg bg-cyan-500 py-3 font-semibold hover:bg-cyan-400 disabled:bg-slate-600"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         {message && (
-          <p className="mt-4 text-center text-red-400">{message}</p>
+          <p className="mt-4 text-center text-red-400">
+            {message}
+          </p>
         )}
+
       </div>
     </main>
   );
